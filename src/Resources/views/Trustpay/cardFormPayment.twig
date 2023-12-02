@@ -1,0 +1,45 @@
+
+{% extends '@SyliusShop/Checkout/layout.html.twig' %}
+{% block title %}{{ 'sylius.ui.complete'|trans }} | {{ parent() }}{% endblock %}
+{% block metatags %}
+    <script type="text/javascript" src="https://tpgw.trustpay.eu/js/v1.js"></script>
+{% endblock %}
+
+
+
+{% block  content %}
+    <div id="card-element"></div>
+    <button id="button-pay">PAY</button>
+{% endblock %}
+{% block javascripts %}
+
+    <script>
+        var cardComponent = trustPayApi.createComponent("card", {});
+        cardComponent.mount("#card-element");
+
+
+        document.getElementById("button-pay").addEventListener("click", function(){
+        // send card data to TrustPay and execute payment
+        // payment secret can be found in secrets object you have received from server
+        trustPayApi.finishCardPayment(paymentSecret, { card: cardComponent}).then(function(result) {
+            if (result.status >= 0) {
+                // the payment has completed successfully
+                // execute additional payment status check on your server
+                // show success to your customer
+                console.log('first: ', result);
+            } else {
+                // the payment has failed
+                // execute additional payment status check on your server
+                // show error to your customer
+                console.log('error')
+            }
+        })
+        .catch(function(result) {
+            // the payment has failed
+            // show error to your customer
+            console.log('catch: ', result);
+        }); 
+});
+    </script>
+    {{ sylius_template_event('sylius.shop.layout.javascripts') }}
+{% endblock %}

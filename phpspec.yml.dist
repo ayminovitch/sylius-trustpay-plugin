@@ -1,0 +1,4 @@
+suites:
+    main:
+        namespace: Ayminovitch\TrustpayPlugin
+        psr4_prefix: Ayminovitch\TrustpayPlugin
