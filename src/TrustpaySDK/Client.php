@@ -7,6 +7,7 @@ class Client
 {
     private static $_defaultUsername = null;
     private static $_defaultPassword = null;
+    private static $_defaultApiKey = null;
     private static $_defaultPublicKey = null;
     private static $_defaultProxyHost = null;
     private static $_defaultProxyPort = null;
@@ -17,6 +18,7 @@ class Client
 
     private $_username = null;
     private $_password = null;
+    private $_apiKey = null;
     private $_publicKey = null;
     private $_connectionTimeout = 45;
     private $_timeout = 45;
@@ -31,6 +33,7 @@ class Client
         /* Assign default values */
         $this->_username = self::$_defaultUsername;
         $this->_password = self::$_defaultPassword;
+        $this->_apiKey = self::$_defaultApiKey;
         $this->_publicKey = self::$_defaultPublicKey;
         $this->_proxyHost = self::$_defaultProxyHost;
         $this->_proxyPort = self::$_defaultProxyPort;
@@ -42,6 +45,7 @@ class Client
     public static function resetDefaultConfiguration() {
         self::$_defaultUsername = null;
         self::$_defaultPassword = null;
+        self::$_defaultApiKey = null;
         self::$_defaultPublicKey = null;
         self::$_defaultProxyHost = null;
         self::$_defaultProxyPort = null;
@@ -111,6 +115,18 @@ class Client
         return $this->_password;
     }
 
+    public function setDefaultApiKey($defaultApiKey){
+        self::$_defaultApiKey = $defaultApiKey;
+    }
+
+    public function setApiKey($apiKey){
+        $this->_apiKey = $apiKey;
+    }
+
+    public function getApiKey(){
+        return $this->_apiKey;
+    }
+
     public static function setDefaultPublicKey($defaultPublicKey) {
         self::$_defaultPublicKey = $defaultPublicKey;
     }
@@ -148,12 +164,8 @@ class Client
 
     public function post($target, $array)
     {
-        if (!$this->_username) {
-            throw new LyraException("username is not defined in the SDK");
-        }
-
-        if (!$this->_password) {
-            throw new LyraException("password is not defined in the SDK");
+        if (!$this->_apiKey) {
+            throw new LyraException("api key is not defined in the SDK");
         }
 
         if (!$this->_endpoint) {
@@ -179,12 +191,11 @@ class Client
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER,[
-            'X-API-KEY: ' . $this->GetToken($this->_username, $this->_password),
-            'Content-type: application/json'
+            'X-API-KEY: ' . $this->_apiKey
         ]);
         curl_setopt($curl, CURLOPT_POST, true);
         // dd(json_encode($array));
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($array));
+        curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($array));
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT , $this->_connectionTimeout);
         curl_setopt($curl, CURLOPT_TIMEOUT, $this->_timeout);
 
@@ -325,7 +336,7 @@ class Client
         $context  = stream_context_create($options);
         $response = file_get_contents($url, false, $context);
         $response = json_decode(file_get_contents($url, false, $context), true);
-        dd($response);
+        // dd($response);
         return $response['access_token'];
     }
 }

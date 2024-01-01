@@ -21,7 +21,9 @@
             <argument type="service" id="Twig\Environment"/>
             <tag name="payum.action" factory="sylius_payment" alias="payum.action.capture" />
         </service>
+
         <service id="Payum\Bundle\PayumBundle\Controller\CaptureController" class="Ayminovitch\TrustpayPlugin\Payum\Controller\CaptureController"/>
+        
         <service id="sylius.controller.payum" class="Ayminovitch\TrustpayPlugin\Payum\Controller\PayumController" public="true">
             <argument type="service" id="payum" />
             <argument type="service" id="sylius.repository.order" />
@@ -37,5 +39,7 @@
             <argument type="service" id="sylius.factory.payum_get_status_action" />
             <argument type="service" id="sylius.factory.payum_resolve_next_route" />
         </service>
+
+        
     </services>
 </container>

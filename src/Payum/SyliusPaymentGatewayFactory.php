@@ -17,10 +17,10 @@ final class SyliusPaymentGatewayFactory extends GatewayFactory
         $config->defaults([
             'payum.factory_name' => 'sylius_payment',
             'payum.factory_title' => 'Trustpay Payment',
-            'payum.action.status' => new StatusAction(new SyliusApi($config['api_key'], $config['id_boutique']), new Client()),
+            'payum.action.status' => new StatusAction(new SyliusApi($config['api_key']), new Client()),
         ]);
         $config['payum.api'] = function (ArrayObject $config) {
-            return new SyliusApi($config['api_key'], $config['id_boutique']);
+            return new SyliusApi($config['api_key']);
         };
     }
 }

@@ -1,5 +1,5 @@
 {
-    "name": "ayminovitch/sylius-trustpay-plugin",
+    "name": "ayminovitch/sylius-trustpaytest-plugin",
     "type": "sylius-plugin",
     "description": "Plugin for add a trustpay gateway payment",
     "keywords": [

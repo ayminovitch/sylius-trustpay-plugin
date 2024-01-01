@@ -45,11 +45,18 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
         $orderId= $payment->getOrder()->getId();
 //        testpublickey_mETb5YxL8BWUi0f4ITfqQH4tbzkA0kSTA6Ypy2P1ejsSm
 
-        $this->client->setUsername($this->api->getIdBoutique());
-        $this->client->setPassword($this->api->getApiKey());
-        $this->client->setEndpoint('https://tpgw.trustpay.eu/');
-        $store = array("amount" => $payment->getAmount(),
-            "currency" => $payment->getCurrencyCode());
+        $endpoint = 'https://test-tpgw.trustpay.eu/';
+        // $endpoint = 'https://webhook.site/';
+
+        $this->client->setApiKey($this->api->getApiKey());
+        $this->client->setEndpoint($endpoint);
+        $store = 
+        [
+            "amount" => $payment->getAmount(),
+            "currency" => $payment->getCurrencyCode(),
+            "initApplePay" => "true",
+            "initGooglePay" => "true",
+        ];
             
         $response = $this->client->post("api/v1/intent", $store);
  
@@ -72,7 +79,10 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
                 'publicKey'=> $this->client->getPublicKey(),
                 'clientEndpoint'=>$this->client->getClientEndpoint(),
                 'lyraClient'=>$this->client,
+                'order' => $payment->getOrder()
         ]);
+
+        // dd($request->getDataForm());
 
     }
 

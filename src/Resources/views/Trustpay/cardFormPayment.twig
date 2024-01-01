@@ -1,45 +1,201 @@
 
+
+
 {% extends '@SyliusShop/Checkout/layout.html.twig' %}
-{% block title %}{{ 'sylius.ui.complete'|trans }} | {{ parent() }}{% endblock %}
-{% block metatags %}
-    <script type="text/javascript" src="https://tpgw.trustpay.eu/js/v1.js"></script>
+
+{% block title %}{{ 'sylius.ui.payment'|trans }} | {{ parent() }}{% endblock %}
+
+{% set order = formData.order %}
+{% set billingAddress = order.billingAddress %}
+{% set shippingAddress = order.shippingAddress %}
+
+{% import "@SyliusShop/Common/Macro/money.html.twig" as money %}
+
+{% block content %}
+    <main class="overflow-x-hidden main--benefits">
+        <section class="padding-style-4 padding-top-0">
+            <div class="container-large">
+                {{ sylius_template_event('sylius.shop.checkout.select_payment.before_form', {'order': order}) }}
+
+                    <div class="row">
+                        <div class="main-content main-content-basket col-12 col-lg-7 margin-bottom-md-4">
+                            <section class="basket-process-section no-padding bg-gray-light">
+                                <ul class="basket-process-list d-flex flex-wrap">
+                                    <li class="basket-process-list-item">
+                                        <a class="basket-process-list-link" href="{{ path('sylius_shop_checkout_select_shipping') }}">
+                                            <span class="basket-process-list-text zeta">2. {{ 'app.shop.cart_address_steps_shipping'|trans }}</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="basket-process-list-item is-active">
+                                        <span class="basket-process-list-link">
+                                            <span class="basket-process-list-text zeta">3. {{ 'app.shop.cart_address_steps_payment'|trans }}</span>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </section>
+
+                            <div class="js-active-block">
+                                <div class="row gutter-20">
+                                    <div class="basket-left-panel-transport col-12 col-xl-12 margin-bottom-3 margin-bottom-md-4">
+                                        {# <div class="basket-select-box"> #}
+                                            <div id="card-element" class="pt-5"></div>
+                                            <button id="button-pay">PAY</button> 
+                                            <div id="gpay-element" class="pt-5"></div>
+                                            <div id="apple-pay-element" class="pt-5"></div>
+                                        {# </div> #}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <aside class="side-panel-basket-summary side-panel-basket-summary--bg col-12 col-lg-5 margin-bottom-2">
+                            <div class="side-md-position-sticky-70">
+                                <div class="padding-content-2-2 p-color-white h-color-white content-margin-sm-negative pos-r bg-md-black">
+                                    <div class="z-index-2 pos-r">
+                                        <div class="row gutter-10 align-items-center margin-bottom-2 margin-top-md-1-5">
+                                            <div class="col-12 h-margin-0">
+                                                <div class="epsilon">
+                                                    {{ 'app.shop.cart_summary_order_totals'|trans }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line hr-line-normal hr-line-white"></div>
+
+                                        {% if order.shipments is not empty %}
+                                            <div class="row p-margin-05 p-size-14">
+                                                <div class="basket-summary-type-name col-5 col-sm-4">
+                                                    <p>{{ 'app.shop.cart_summary_totals_shipping_price'|trans }}</p>
+                                                </div>
+
+                                                <div class="basket-summary-type-edit col-4 col-sm-3">
+                                                    <div class="a-link a-hover-link-red basket-product-action__item">
+                                                        <span class="a-link-icon ico-size-12 a-link-icon-small a-link-icon-right ico-color-white">
+                                                            {{ source('images/icons/icon-settings.svg') }}
+                                                        </span>
+
+                                                        <a class="a-link-white a-link-text a-link-text-14 a-link-black a-link-underline" href="{{ path('sylius_shop_checkout_select_shipping') }}">{{ 'app.shop.cart_address_edit'|trans }}</a>
+                                                    </div>
+                                                </div>
+
+                                                <div class="basket-summary-type-price col-3 col-sm-5 txt-r">
+                                                    <p>{{ money.convertAndFormat(order.shippingTotal) }}</p>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if order.orderPromotionTotal %}
+                                            <div class="row p-margin-05 p-size-14">
+                                                <div class="col-6">
+                                                    <p>{{ 'sylius.ui.discount'|trans }}</p>
+                                                </div>
+
+                                                <div class="col-6 txt-r">
+                                                    <p>{{ money.convertAndFormat(order.orderPromotionTotal) }}</p>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="hr-line hr-line-normal hr-line-white"></div>
+
+                                        <div class="row gutter-10 h-margin-0 margin-bottom-2">
+                                            <div class="col-7">
+                                                <div class="zeta">{{ 'app.shop.cart_summary_totals_with_tax'|trans }}</div>
+                                            </div>
+
+                                            <div class="col-5 txt-r">
+                                                <div class="zeta">{{ money.convertAndFormat(order.total) }}</div>
+                                            </div>
+                                        </div>
+
+                                        <button class="btn btn-green-fill btn-responsive btn-size-normal-ext btn-normal" type="submit" id="next-step">{{ 'app.shop.cart_address_next_check'|trans }}</button>
+
+                                        <div class="margin-top-1-5">
+                                            <div class="d-flex align-items-center justify-content-center txt-c p-size-16 p-sm-size-14 p-xs-size-12 p-margin-0 margin-top-05">
+                                                <span class="margin-right-05 ico-size-26 ico-color-white">
+                                                    {{ source('images/icons/icon-security.svg') }}
+                                                </span>
+
+                                                <p>{{ 'app.shop.cart_address_check_ssl_connection'|trans }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+
+            </div>
+        </section>
+    </main>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {% endblock %}
 
-
-
-{% block  content %}
-    <div id="card-element"></div>
-    <button id="button-pay">PAY</button>
-{% endblock %}
 {% block javascripts %}
-
+    {{ parent() }}
+    <script type="text/javascript" src="https://test-tpgw.trustpay.eu/js/v1.js"></script>
     <script>
-        var cardComponent = trustPayApi.createComponent("card", {});
+        const secrets = {
+            display: "{{ formData.secrets.display }}",
+            payment: "{{ formData.secrets.payment }}"
+        };
+        var trustPayApi = new TrustPayApi(secrets, {testEnvironment: true, allowMirroring:true});
+        var cardComponent = trustPayApi.createComponent("card",
+            {
+                style: {
+                    fontFamily: "Arial, Helvetica, sans-serif",
+                    fontSize: "1em",
+                }
+        });
+
+        var gPayComponent = trustPayApi.createComponent("googlePay", {});
+
+
         cardComponent.mount("#card-element");
+        gPayComponent.mount("#gpay-element");
 
 
         document.getElementById("button-pay").addEventListener("click", function(){
         // send card data to TrustPay and execute payment
         // payment secret can be found in secrets object you have received from server
-        trustPayApi.finishCardPayment(paymentSecret, { card: cardComponent}).then(function(result) {
-            if (result.status >= 0) {
-                // the payment has completed successfully
-                // execute additional payment status check on your server
-                // show success to your customer
-                console.log('first: ', result);
-            } else {
+        console.log("Pay btn clicked");
+            trustPayApi.finishCardPayment(secrets, { card: cardComponent}).then(function(result) {
+                console.log(result);
+                if (result.status >= 0) {
+                    // the payment has completed successfully
+                    // execute additional payment status check on your server
+                    // show success to your customer
+                    console.log('first: ', result);
+                } else {
+                    // the payment has failed
+                    // execute additional payment status check on your server
+                    // show error to your customer
+                    console.log('error')
+                }
+            })
+            .catch(function(result) {
                 // the payment has failed
-                // execute additional payment status check on your server
                 // show error to your customer
-                console.log('error')
-            }
-        })
-        .catch(function(result) {
-            // the payment has failed
-            // show error to your customer
-            console.log('catch: ', result);
-        }); 
-});
+                console.log('catch: ', result);
+            }); 
+        });
     </script>
     {{ sylius_template_event('sylius.shop.layout.javascripts') }}
 {% endblock %}

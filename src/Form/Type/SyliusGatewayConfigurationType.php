@@ -14,7 +14,6 @@ final class SyliusGatewayConfigurationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-        ->add('api_key', PasswordType::class)
-        ->add('id_boutique', TextType::class);
+        ->add('api_key', PasswordType::class);
     }
 }

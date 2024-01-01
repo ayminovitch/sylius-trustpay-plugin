@@ -41,15 +41,18 @@ final class StatusAction implements ActionInterface
         $payment = $request->getFirstModel();
 
         $details = $payment->getDetails();
-        $this->client->setUsername($this->api->getIdBoutique());
-        $this->client->setPassword($this->api->getApiKey());
+
+        dump($details);
+        exit();
+
+        $this->client->setApiKey($this->api->getApiKey());
         $this->client->setEndpoint('https://tpgw.trustpay.eu/');
 
         // if(!$this->client->checkHash($this->client->getSHA256Key())){
         //     $request->markCanceled();
         //     throw new LyraException("Invalid Hash FRAUD SPOTTED");
         // }
-        $paymentResponse= json_decode($_POST['kr-answer']);
+        $paymentResponse= json_decode($_POST['status']);
         $payment->setDetails((array) $paymentResponse);
 //        $request->getModel()->setStorage((array) $paymentResponse);
         $statusPayment= $paymentResponse->orderStatus;

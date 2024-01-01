@@ -51,26 +51,28 @@ class CaptureController extends PayumController
 
         $gateway = $this->getPayum()->getGateway($token->getGatewayName());
         $captureRequest= new CaptureRequest($token);
+
         $gateway->execute($captureRequest);
-        if ($token->getGatewayName() === "trustpay") {
+        // if ($token->getGatewayName() === "trustpay") {
 
             return $this->render('Trustpay/cardFormPayment.twig', ['formData' => $captureRequest->getDataForm(), 'redirectUrl' => $token->getAfterUrl()]);
 
-        }
-        $this->getPayum()->getHttpRequestVerifier()->invalidate($token);
+        // }
+        // $this->getPayum()->getHttpRequestVerifier()->invalidate($token);
 
-        return $this->redirect($token->getAfterUrl());
+        // return $this->redirect($token->getAfterUrl());
     }
     public function afterCaptureAction(Request $request): Response
     {
+        dump($request);die();
+
         $configuration = $this->requestConfigurationFactory->create($this->orderMetadata, $request);
 
         $token = $this->getHttpRequestVerifier()->verify($request);
 
         /** @var Generic&GetStatusInterface $status */
         $status = $this->getStatusRequestFactory->createNewWithModel($token);
-        dump($request);
-        dump($status);die();
+        
         $this->payum->getGateway($token->getGatewayName())->execute($status);
 
         $resolveNextRoute = $this->resolveNextRouteRequestFactory->createNewWithModel($status->getFirstModel());
